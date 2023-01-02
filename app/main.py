@@ -1,11 +1,13 @@
-from fastapi import FastAPI, status, HTTPException
-from fastapi import Body
+from fastapi import FastAPI, status, HTTPException, Depends
 from pydantic import BaseModel
-from typing import Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from sqlalchemy.orm import Session
+from . import models
+from .database import engine, get_db
 
 app = FastAPI()
+models.Base.metadata.create_all(bind=engine)
 
 
 class Post(BaseModel):
@@ -28,11 +30,8 @@ def root():
 
 
 @app.get("/posts")
-def get_posts():
-    sql = 'SELECT * FROM posts'
-    cursor.execute(sql)
-    posts = cursor.fetchall()
-    return {"posts": posts}
+def get_posts(db: Session = Depends(get_db)):
+    return {"status": "success"}
 
 
 @app.get("/posts/{id}")
