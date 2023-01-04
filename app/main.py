@@ -59,4 +59,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     post.delete(synchronize_session=False)
     db.commit()
     return {}
+
+
 # comment
+# other comment
