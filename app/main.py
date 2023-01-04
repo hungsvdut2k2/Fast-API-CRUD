@@ -1,6 +1,5 @@
 from fastapi import FastAPI, status, HTTPException, Depends
 from pydantic import BaseModel
-from psycopg2.extras import RealDictCursor
 from sqlalchemy.orm import Session
 from . import models
 from .database import engine, get_db
