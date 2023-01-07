@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status, HTTPException, Depends
 from sqlalchemy.orm import Session
-from . import models, schemas
+from . import models, schemas, utils
 from .database import engine, get_db
 from typing import List
 
@@ -52,5 +52,18 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     if not post.first():
         raise HTTPException(status_code=404, detail="Post not found")
     post.delete(synchronize_session=False)
+    db.commit()
+    return
+
+
+@app.post("/users", status_code=status.HTTP_201_CREATED)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    existed_user = db.query(models.Post).filter(models.User.email == user.email).first()
+    if existed_user:
+        raise HTTPException(status_code=409, detail="This email has been used")
+    hashed_password = utils.hash(user.password)
+    user.password = hashed_password
+    new_user = models.User(**user.dict())
+    db.add(new_user)
     db.commit()
     return
